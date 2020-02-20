@@ -1,5 +1,7 @@
 const { Router } = require('express')
 
+const { Question } = require('../../../models')
+
 const router = new Router({ mergeParams: true })
 
 router.get('/', (req, res) => {
@@ -22,7 +24,7 @@ router.get('/:questionId', (req, res) => {
 
 router.post('/', (req, res) => {
   try {
-    // eslint-disable-next-line radix,no-undef
+    // eslint-disable-next-line radix
     const q = Question.create({ ...req.body, quizId: parseInt(req.params.quizId) })
     res.status(201).json(q)
   } catch (err) {
