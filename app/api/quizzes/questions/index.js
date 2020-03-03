@@ -4,10 +4,13 @@ const { Question } = require('../../../models')
 
 const router = new Router()
 
+const { Answer } = require('../../../models')
+
+const AnswersRouter = require('./answers')
+
 router.get('/', (req, res) => {
   try {
-    // eslint-disable-next-line no-undef
-    res.status(200).json(Question.get())
+    res.status(200).json(Question.get().map((question) => ({ ...question, answers: Answer.get().filter((answer) => (answer.questionIdi === question.id)) })))
   } catch (err) {
     res.status(500).json(err)
   }
@@ -15,8 +18,8 @@ router.get('/', (req, res) => {
 
 router.get('/:questionId', (req, res) => {
   try {
-    // eslint-disable-next-line no-undef
-    res.status(200).json(Question.getById(req.params.questionId))
+    // eslint-disable-next-line radix
+    res.status(200).json({ ...Question.getById(req.params.questionId), answers: Answer.get().filter((answer) => (answer.questionIdi === parseInt(req.params.questionId))) })
   } catch (err) {
     res.status(500).json(err)
   }
@@ -25,7 +28,6 @@ router.get('/:questionId', (req, res) => {
 
 router.post('/', (req, res) => {
   try {
-    // eslint-disable-next-line radix
     const q = Question.create(req.body)
     // si je fais {...req.body, req.params.questionId } je créer un objet à l'intérieur d'un objet et donc c'est pas bon!!
     res.status(201).json(q)
@@ -40,7 +42,6 @@ router.post('/', (req, res) => {
 
 router.delete('/:questionId', (req, res) => {
   try {
-    // eslint-disable-next-line no-undef
     res.status(200).json(Question.delete(req.params.questionId))
   } catch (err) {
     res.status(500).json(err)
@@ -50,11 +51,11 @@ router.delete('/:questionId', (req, res) => {
 
 router.put('/:questionId', (req, res) => {
   try {
-    // eslint-disable-next-line no-undef
     res.status(200).json(Question.update(req.params.questionId, req.body))
   } catch (err) {
     res.status(500).json(err)
   }
 })
 
+router.use('/:questionId/answers', AnswersRouter)
 module.exports = router
