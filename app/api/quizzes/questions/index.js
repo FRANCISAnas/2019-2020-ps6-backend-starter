@@ -2,7 +2,7 @@ const { Router } = require('express')
 
 const { Question } = require('../../../models')
 
-const router = new Router({ mergeParams: true })
+const router = new Router()
 
 router.get('/', (req, res) => {
   try {
@@ -22,10 +22,12 @@ router.get('/:questionId', (req, res) => {
   }
 })
 
+
 router.post('/', (req, res) => {
   try {
     // eslint-disable-next-line radix
-    const q = Question.create({ ...req.body, quizId: parseInt(req.params.quizId) })
+    const q = Question.create(req.body)
+    // si je fais {...req.body, req.params.questionId } je créer un objet à l'intérieur d'un objet et donc c'est pas bon!!
     res.status(201).json(q)
   } catch (err) {
     if (err.name === 'ValidationError') {
@@ -54,6 +56,5 @@ router.put('/:questionId', (req, res) => {
     res.status(500).json(err)
   }
 })
-
 
 module.exports = router

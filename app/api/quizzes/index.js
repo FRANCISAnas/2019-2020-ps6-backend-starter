@@ -4,11 +4,13 @@ const { Quiz } = require('../../models')
 
 const QuestionsRouter = require('./questions')
 
+const { Question } = require('../../models')
+
 const router = new Router()
 
 router.get('/', (req, res) => {
   try {
-    res.status(200).json(Quiz.get())
+    res.status(200).json(Quiz.get().map((quiz) => ({ ...quiz, questions: Question.get().filter((question) => (question.quizId === quiz.id)) })))
   } catch (err) {
     res.status(500).json(err)
   }
@@ -37,7 +39,8 @@ router.put('/:quizId', (req, res) => {
 
 router.get('/:quizId', (req, res) => {
   try {
-    res.status(200).json(Quiz.getById(req.params.quizId))
+    // eslint-disable-next-line radix
+    res.status(200).json({ ...Quiz.getById(req.params.quizId), questions: Question.get().filter((question) => (question.quizId === parseInt(req.params.quizId))) })
   } catch (err) {
     res.status(500).json(err)
   }
@@ -45,7 +48,6 @@ router.get('/:quizId', (req, res) => {
 
 router.delete('/:quizId', (req, res) => {
   try {
-    console.log(req.params.quizId)
     res.status(200).json(Quiz.delete(req.params.quizId))
   } catch (err) {
     res.status(500).json(err)
